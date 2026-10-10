@@ -1,0 +1,13 @@
+# Compiled schemas should be generated at install time, though some extensions include them, keeping repo clean
+schemas/gschemas.compiled
+
+# Packaged archives
+*.shell-extension.zip
+*.zip
+*.tar.gz
+
+# OS and editor files
+.DS_Store
+*~
+*.swp
+*.bak

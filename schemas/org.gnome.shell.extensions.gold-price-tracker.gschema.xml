@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gold-price-tracker">
+  <schema id="org.gnome.shell.extensions.gold-price-tracker"
+          path="/org/gnome/shell/extensions/gold-price-tracker/">
+    <key name="refresh-interval" type="i">
+      <default>30</default>
+      <summary>刷新间隔（秒）</summary>
+      <description>从金价接口拉取最新行情的时间间隔（秒）</description>
+      <range min="1" max="3600"/>
+    </key>
+
+    <key name="holding-grams" type="d">
+      <default>0.0</default>
+      <summary>持有黄金克数</summary>
+      <description>用于计算持仓总市值与盈亏的持仓克数</description>
+    </key>
+
+    <key name="cost-price" type="d">
+      <default>0.0</default>
+      <summary>买入均价成本（元/克）</summary>
+      <description>用于计算累计盈亏与收益率的成本价格</description>
+    </key>
+
+    <key name="color-scheme" type="s">
+      <default>'red-up-green-down'</default>
+      <summary>涨跌配色模式</summary>
+      <description>'red-up-green-down' 为红涨绿跌，'green-up-red-down' 为绿涨红跌</description>
+    </key>
+
+    <key name="display-format" type="s">
+      <default>'price-rate'</default>
+      <summary>顶栏显示格式</summary>
+      <description>'price-rate': 现价+涨跌幅, 'price-arrow': 现价+箭头, 'price-only': 仅现价</description>
+    </key>
+
+    <key name="show-icon" type="b">
+      <default>true</default>
+      <summary>显示金币图标</summary>
+      <description>是否在顶栏价格前显示金币图标</description>
+    </key>
+
+    <key name="trade-hours-only" type="b">
+      <default>true</default>
+      <summary>仅在开市时间请求</summary>
+      <description>联动节假日与交易所交易时段，休市期间暂停自动轮询</description>
+    </key>
+
+    <key name="battery-saving" type="b">
+      <default>true</default>
+      <summary>电池供电暂停刷新</summary>
+      <description>使用笔记本电池供电时自动暂停后台轮询以节约电量</description>
+    </key>
+
+    <key name="morning-session" type="s">
+      <default>'09:00-11:30'</default>
+      <summary>早盘开市时段</summary>
+      <description>早盘开市交易时间范围，格式为 HH:MM-HH:MM，留空不开启</description>
+    </key>
+
+    <key name="afternoon-session" type="s">
+      <default>'13:30-15:30'</default>
+      <summary>午盘开市时段</summary>
+      <description>午盘开市交易时间范围，格式为 HH:MM-HH:MM，留空不开启</description>
+    </key>
+
+    <key name="night-session" type="s">
+      <default>'20:00-02:30'</default>
+      <summary>夜盘开市时段</summary>
+      <description>夜盘开市交易时间范围，格式为 HH:MM-HH:MM（支持跨夜），留空不开启</description>
+    </key>
+  </schema>
+</schemalist>

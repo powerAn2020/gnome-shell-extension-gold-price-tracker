@@ -1,0 +1,154 @@
+/* Gold Price Tracker Stylesheet - Adaptive for Light and Dark themes */
+
+.gold-tracker-panel-box {
+    spacing: 4px;
+}
+
+.gold-tracker-panel-label {
+    font-weight: bold;
+    font-size: 13px;
+    margin-top: 1px;
+}
+
+/* Colors with high contrast on both light and dark backgrounds */
+.gold-color-up {
+    color: #d32f2f; /* Deep Red for rise */
+}
+
+.gold-color-down {
+    color: #2e7d32; /* Forest Green for fall */
+}
+
+.gold-color-flat {
+    opacity: 0.75;
+}
+
+/* Menu Popup Box */
+.gold-menu-container {
+    padding: 8px 12px;
+    min-width: 300px;
+}
+
+/* Card Section: Neutral 12% gray adapts perfectly to light & dark */
+.gold-card {
+    background-color: rgba(128, 128, 128, 0.12);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(128, 128, 128, 0.22);
+}
+
+.gold-card-title {
+    font-size: 12px;
+    font-weight: bold;
+    opacity: 0.75;
+    margin-bottom: 6px;
+}
+
+/* Market Header */
+.gold-market-top {
+    spacing: 12px;
+    margin-bottom: 8px;
+}
+
+.gold-large-price {
+    font-size: 26px;
+    font-weight: 800;
+}
+
+.gold-badge {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-left: 8px;
+}
+
+.gold-badge.gold-color-up {
+    background-color: rgba(211, 47, 47, 0.16);
+    color: #d32f2f;
+    border: 1px solid rgba(211, 47, 47, 0.3);
+}
+
+.gold-badge.gold-color-down {
+    background-color: rgba(46, 125, 50, 0.16);
+    color: #2e7d32;
+    border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+.gold-market-subinfo {
+    font-size: 11px;
+    opacity: 0.75;
+    spacing: 8px;
+}
+
+/* Holdings Stats */
+.gold-stat-row {
+    spacing: 10px;
+    margin-bottom: 6px;
+}
+
+.gold-stat-item {
+    spacing: 2px;
+}
+
+.gold-stat-label {
+    font-size: 11px;
+    opacity: 0.75;
+}
+
+.gold-stat-val {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Input quick edit */
+.gold-input-row {
+    spacing: 8px;
+    margin-top: 6px;
+    align-items: center;
+}
+
+.gold-entry {
+    background-color: rgba(128, 128, 128, 0.14);
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    min-width: 85px;
+}
+
+.gold-entry:focus {
+    border: 1px solid #1976d2;
+}
+
+.gold-save-btn {
+    background-color: #1976d2;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 4px 10px;
+}
+
+.gold-save-btn:hover {
+    background-color: #1e88e5;
+}
+
+/* Bottom Action Row */
+.gold-action-bar {
+    spacing: 8px;
+    margin-top: 4px;
+}
+
+.gold-action-btn {
+    background-color: rgba(128, 128, 128, 0.14);
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+.gold-action-btn:hover {
+    background-color: rgba(128, 128, 128, 0.26);
+}

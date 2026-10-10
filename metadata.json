@@ -1,0 +1,12 @@
+{
+  "name": "实时金价监控",
+  "description": "实时展示浙商积存金行情，支持红涨绿跌、持仓市值与盈亏实时测算，支持首选项定制与快捷设置",
+  "uuid": "gold-price-tracker@poweran",
+  "shell-version": [
+    "45",
+    "46",
+    "47"
+  ],
+  "settings-schema": "org.gnome.shell.extensions.gold-price-tracker",
+  "version": 1
+}
