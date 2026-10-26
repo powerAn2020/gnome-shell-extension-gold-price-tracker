@@ -333,7 +333,7 @@ class GoldIndicator extends PanelMenu.Button {
         });
 
         const linkBtn = new St.Button({
-            label: '🔗 浙商积存金',
+            label: '🔗 京东积存金',
             style_class: 'gold-action-btn',
             x_expand: true,
             reactive: true,
@@ -623,6 +623,9 @@ class GoldIndicator extends PanelMenu.Button {
         let panelText = price.toFixed(2);
         if (displayFormat === 'price-rate') {
             panelText = `${price.toFixed(2)} ${upAndDownRate}`;
+        } else if (displayFormat === 'price-amount') {
+            const sign = upAndDownAmt > 0 ? '+' : '';
+            panelText = `${price.toFixed(2)} ${sign}${upAndDownAmt.toFixed(2)}`;
         } else if (displayFormat === 'price-arrow') {
             const arrow = isUp ? '▲' : (isDown ? '▼' : '—');
             panelText = `${price.toFixed(2)} ${arrow}`;

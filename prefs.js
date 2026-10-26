@@ -32,6 +32,7 @@ export default class GoldPriceTrackerPreferences extends ExtensionPreferences {
         // 顶栏显示格式 ComboRow
         const formatOptions = [
             { id: 'price-rate', label: '现价 + 今日涨跌幅' },
+            { id: 'price-amount', label: '现价 + 今日涨跌额' },
             { id: 'price-arrow', label: '现价 + 涨跌指示箭头' },
             { id: 'price-only', label: '仅显示现价' },
         ];

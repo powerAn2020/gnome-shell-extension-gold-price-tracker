@@ -30,7 +30,7 @@
     <key name="display-format" type="s">
       <default>'price-rate'</default>
       <summary>顶栏显示格式</summary>
-      <description>'price-rate': 现价+涨跌幅, 'price-arrow': 现价+箭头, 'price-only': 仅现价</description>
+      <description>'price-rate': 现价+涨跌幅, 'price-amount': 现价+涨跌额, 'price-arrow': 现价+箭头, 'price-only': 仅现价</description>
     </key>
 
     <key name="show-icon" type="b">
