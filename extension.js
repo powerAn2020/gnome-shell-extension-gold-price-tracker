@@ -6,6 +6,7 @@ import Soup from 'gi://Soup?version=3.0';
 import St from 'gi://St';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -27,6 +28,13 @@ class GoldIndicator extends PanelMenu.Button {
 
         this._latestData = null;
         this._lastRefreshTime = null;
+        this._lastPrice = null;
+        this._lastFetchTime = null;
+        this._lastAlertTimes = {
+            daily: 0,
+            surge: 0,
+        };
+
         this._cancellable = new Gio.Cancellable();
         this._httpSession = new Soup.Session();
         this._httpSession.timeout = 10;
@@ -367,6 +375,11 @@ class GoldIndicator extends PanelMenu.Button {
             'morning-session',
             'afternoon-session',
             'night-session',
+            'alert-enabled',
+            'alert-daily-threshold',
+            'alert-surge-threshold',
+            'alert-sound',
+            'alert-cooldown',
         ];
 
         keys.forEach(key => {
@@ -381,6 +394,10 @@ class GoldIndicator extends PanelMenu.Button {
                     const c = this._settings.get_double('cost-price');
                     if (this._costEntry) this._costEntry.set_text(c.toFixed(2));
                     this._updateUI();
+                } else if (key === 'alert-enabled') {
+                    if (this._settings.get_boolean('alert-enabled')) {
+                        this._lastAlertTimes = { daily: 0, surge: 0 };
+                    }
                 } else {
                     this._updateUI();
                 }
@@ -438,6 +455,13 @@ class GoldIndicator extends PanelMenu.Button {
                     if (json && json.resultData && json.resultData.datas) {
                         this._latestData = json.resultData.datas;
                         this._lastRefreshTime = new Date();
+
+                        // 异动强提醒检测
+                        const price = parseFloat(this._latestData.price) || 0.0;
+                        const upAndDownAmt = parseFloat(this._latestData.upAndDownAmt) || 0.0;
+                        const upAndDownRate = this._latestData.upAndDownRate || '0.00%';
+                        this._checkFluctuationAlert(price, upAndDownAmt, upAndDownRate);
+
                         this._updateUI();
                     }
                 } catch (e) {
@@ -451,6 +475,94 @@ class GoldIndicator extends PanelMenu.Button {
                 }
             }
         );
+    }
+
+    _sendAlertNotification(title, body) {
+        try {
+            const source = MessageTray.getSystemSource ? MessageTray.getSystemSource() : null;
+            if (source && typeof MessageTray.Notification === 'function') {
+                const urgency = (MessageTray.Urgency && MessageTray.Urgency.CRITICAL !== undefined)
+                    ? MessageTray.Urgency.CRITICAL
+                    : 2;
+                const notification = new MessageTray.Notification({
+                    source: source,
+                    title: title,
+                    body: body,
+                    urgency: urgency,
+                    isTransient: false,
+                });
+                source.addNotification(notification);
+            } else if (typeof Main.notify === 'function') {
+                Main.notify(title, body);
+            }
+        } catch (e) {
+            try {
+                if (typeof Main.notify === 'function') {
+                    Main.notify(title, body);
+                }
+            } catch (fallbackErr) {
+                console.warn(`[GoldPriceTracker] 强提醒通知发送失败: ${fallbackErr.message}`);
+            }
+        }
+
+        if (this._settings.get_boolean('alert-sound')) {
+            try {
+                const player = global.display.get_sound_player ? global.display.get_sound_player() : null;
+                if (player && typeof player.play_from_theme === 'function') {
+                    player.play_from_theme('dialog-warning', title, null);
+                }
+            } catch (soundErr) {
+                console.warn(`[GoldPriceTracker] 播放强提醒提示音失败: ${soundErr.message}`);
+            }
+        }
+    }
+
+    _checkFluctuationAlert(price, upAndDownAmt, upAndDownRate) {
+        if (!this._settings.get_boolean('alert-enabled')) {
+            this._lastPrice = price;
+            this._lastFetchTime = Date.now();
+            return;
+        }
+
+        const now = Date.now();
+        const cooldownMs = Math.max(10, this._settings.get_int('alert-cooldown')) * 1000;
+        const dailyThreshold = this._settings.get_double('alert-daily-threshold');
+        const surgeThreshold = this._settings.get_double('alert-surge-threshold');
+
+        // 1. 短时突发波动检查（相邻拉取价差）
+        if (this._lastPrice !== null && this._lastFetchTime !== null) {
+            const timeDiffMs = now - this._lastFetchTime;
+            // 超过 10 分钟未拉取（如休市重开、电脑睡眠唤醒），跳过单次突变检测防跳空误报
+            if (timeDiffMs <= 10 * 60 * 1000) {
+                const surgeDiff = price - this._lastPrice;
+                const absSurge = Math.abs(surgeDiff);
+                if (absSurge >= surgeThreshold && (now - this._lastAlertTimes.surge >= cooldownMs)) {
+                    const direction = surgeDiff > 0 ? '短时暴涨' : '短时跳水';
+                    const sign = surgeDiff > 0 ? '+' : '';
+                    this._sendAlertNotification(
+                        `⚠️ 浙商积存金${direction}`,
+                        `现价突变 ${sign}${surgeDiff.toFixed(2)} 元/g (阈值: ${surgeThreshold.toFixed(2)})\n当前最新行情: ¥${price.toFixed(2)} 元/g`
+                    );
+                    this._lastAlertTimes.surge = now;
+                }
+            }
+        }
+
+        // 2. 今日累计涨跌幅突破检查
+        const rateNum = Math.abs(parseFloat(upAndDownRate) || 0);
+        if (rateNum >= dailyThreshold && (now - this._lastAlertTimes.daily >= cooldownMs)) {
+            const direction = upAndDownAmt >= 0 ? '大幅上涨' : '大幅下跌';
+            const sign = upAndDownAmt >= 0 ? '+' : '';
+            this._sendAlertNotification(
+                `⚠️ 浙商积存金今日${direction}`,
+                `今日累计涨跌幅达到 ${upAndDownRate} (${sign}${upAndDownAmt.toFixed(2)} 元/g, 阈值: ±${dailyThreshold.toFixed(1)}%)\n当前最新行情: ¥${price.toFixed(2)} 元/g`
+            );
+            this._lastAlertTimes.daily = now;
+        }
+
+        // 更新历史价格与时间锚点
+        this._lastPrice = price;
+        this._lastFetchTime = now;
     }
 
     _updateUI() {

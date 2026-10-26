@@ -68,5 +68,38 @@
       <summary>夜盘开市时段</summary>
       <description>夜盘开市交易时间范围，格式为 HH:MM-HH:MM（支持跨夜），留空不开启</description>
     </key>
+
+    <key name="alert-enabled" type="b">
+      <default>false</default>
+      <summary>启用行情大幅波动强提醒</summary>
+      <description>当价格出现大幅异动或短时剧烈跳变时弹出常驻紧急通知</description>
+    </key>
+
+    <key name="alert-daily-threshold" type="d">
+      <default>1.0</default>
+      <summary>今日累计涨跌幅提醒阈值（%）</summary>
+      <description>当日涨跌幅绝对值超过该百分比时触发强提醒</description>
+      <range min="0.01" max="50.0"/>
+    </key>
+
+    <key name="alert-surge-threshold" type="d">
+      <default>2.0</default>
+      <summary>短时突发波动提醒阈值（元/g）</summary>
+      <description>单次拉取与上次相比波动金额超过该数值时触发强提醒</description>
+      <range min="0.01" max="100.0"/>
+    </key>
+
+    <key name="alert-sound" type="b">
+      <default>true</default>
+      <summary>强提醒伴随警报声</summary>
+      <description>触发强提醒时播放系统提示音</description>
+    </key>
+
+    <key name="alert-cooldown" type="i">
+      <default>300</default>
+      <summary>告警防打扰冷却间隔（秒）</summary>
+      <description>同一类型的强提醒在冷却时间内不重复发送通知</description>
+      <range min="10" max="7200"/>
+    </key>
   </schema>
 </schemalist>

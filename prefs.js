@@ -204,5 +204,86 @@ export default class GoldPriceTrackerPreferences extends ExtensionPreferences {
         });
         resetRow.add_suffix(resetBtn);
         hoursGroup.add(resetRow);
+
+        // ========== 5. 行情波动强提醒设置 ==========
+        const alertGroup = new Adw.PreferencesGroup({
+            title: '行情波动强提醒',
+            description: '当价格大幅异动或短时跳变达到阈值时发送常驻高优先级通知',
+        });
+        page.add(alertGroup);
+
+        // 强提醒总开关
+        const alertEnableRow = new Adw.SwitchRow({
+            title: '启用波动强提醒',
+            subtitle: '价格异动突破阈值时弹出常驻紧急通知',
+        });
+        settings.bind('alert-enabled', alertEnableRow, 'active', Gio.SettingsBindFlags.DEFAULT);
+        alertGroup.add(alertEnableRow);
+
+        // 今日累计涨跌幅阈值 SpinRow
+        const dailyThresholdRow = new Adw.SpinRow({
+            title: '今日累计涨跌幅阈值（%）',
+            subtitle: '当日涨幅或跌幅绝对值达到该数值时触发（0.1% ~ 20.0%）',
+            digits: 1,
+            adjustment: new Gtk.Adjustment({
+                lower: 0.1,
+                upper: 20.0,
+                step_increment: 0.1,
+                page_increment: 0.5,
+                value: settings.get_double('alert-daily-threshold'),
+            }),
+        });
+        settings.bind('alert-daily-threshold', dailyThresholdRow.adjustment, 'value', Gio.SettingsBindFlags.DEFAULT);
+        alertGroup.add(dailyThresholdRow);
+
+        // 短时突发波动阈值 SpinRow
+        const surgeThresholdRow = new Adw.SpinRow({
+            title: '短时突发波动阈值（元/g）',
+            subtitle: '相邻刷新周期价格突变超过该金额时触发（0.1 ~ 50.0 元/g）',
+            digits: 1,
+            adjustment: new Gtk.Adjustment({
+                lower: 0.1,
+                upper: 50.0,
+                step_increment: 0.1,
+                page_increment: 1.0,
+                value: settings.get_double('alert-surge-threshold'),
+            }),
+        });
+        settings.bind('alert-surge-threshold', surgeThresholdRow.adjustment, 'value', Gio.SettingsBindFlags.DEFAULT);
+        alertGroup.add(surgeThresholdRow);
+
+        // 提示音开关
+        const soundRow = new Adw.SwitchRow({
+            title: '伴随警报提示音',
+            subtitle: '触发强提醒时同步播放系统警报声音',
+        });
+        settings.bind('alert-sound', soundRow, 'active', Gio.SettingsBindFlags.DEFAULT);
+        alertGroup.add(soundRow);
+
+        // 告警冷却时间 SpinRow
+        const cooldownRow = new Adw.SpinRow({
+            title: '告警防骚扰冷却时长（秒）',
+            subtitle: '同一类型的异动提醒在冷却时间内不重复打扰（30 ~ 3600 秒）',
+            adjustment: new Gtk.Adjustment({
+                lower: 30,
+                upper: 3600,
+                step_increment: 30,
+                page_increment: 60,
+                value: settings.get_int('alert-cooldown'),
+            }),
+        });
+        settings.bind('alert-cooldown', cooldownRow.adjustment, 'value', Gio.SettingsBindFlags.DEFAULT);
+        alertGroup.add(cooldownRow);
+
+        // 联动交互状态
+        const updateAlertSensitivity = () => {
+            const active = alertEnableRow.active;
+            dailyThresholdRow.sensitive = active;
+            surgeThresholdRow.sensitive = active;
+            soundRow.sensitive = active;
+            cooldownRow.sensitive = active;
+        };
+        alertEnableRow.connect('notify::active', updateAlertSensitivity);
+        updateAlertSensitivity();
     }
 }
